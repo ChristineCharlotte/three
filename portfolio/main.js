@@ -38,7 +38,7 @@ function generatePlane() {
 }
 
 const raycaster = new THREE.Raycaster();
-console.log(raycaster);
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
   150,
@@ -63,9 +63,9 @@ new OrbitControls(camera, renderer.domElement);
 // create mesh
 const planeGeometry = new THREE.PlaneGeometry(5, 5, 30, 30);
 const planeMaterial = new THREE.MeshPhongMaterial({
-  color: 0xff0000,
   side: THREE.DoubleSide,
   flatShading: THREE.FlatShading,
+  vertexColors: true,
 });
 const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
 scene.add(planeMesh);
@@ -73,6 +73,7 @@ scene.add(planeMesh);
 console.log(planeMesh.geometry);
 
 const { array } = planeMesh.geometry.attributes.position;
+console.log(array);
 
 for (let i = 0; i < array.length; i += 3) {
   const x = array[i];
@@ -80,7 +81,24 @@ for (let i = 0; i < array.length; i += 3) {
   const z = array[i + 2];
 
   array[i + 2] = z + Math.random();
+
+  // Do something
 }
+
+console.log(planeMesh.geometry.attributes);
+
+const colors = [];
+for (let i = 0; i < 121; i++) {
+  colors.push(0, 0, 1);
+}
+
+console.log(colors);
+
+planeMesh.geometry.setAttribute(
+  'color',
+  new THREE.BufferAttribute(new Float32Array(colors)),
+  3
+);
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(0, 0, 1);
@@ -97,6 +115,7 @@ const mouse = {
   x: undefined,
   y: undefined,
 };
+
 addEventListener('mousemove', (event) => {
   mouse.x = (event.clientX / innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / innerHeight) * 2 + 1;
@@ -106,15 +125,11 @@ addEventListener('mousemove', (event) => {
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
-  // mesh.rotation.x += 0.01
-  // mesh.rotation.y += 0.01
-  // planeMesh.rotation.x += 0.01
-  // planeMesh.rotation.y += 0.01
 
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObject(planeMesh);
   if (intersects.length > 0) {
-    console.log('intersecting');
+    console.log(intersects[0], face);
   }
 }
 
